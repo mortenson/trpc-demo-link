@@ -1,7 +1,7 @@
 # trpc-demo-link
 
 An example repository that shows how you can use tRPC client links
-to mock your entire tRPC API for building product demos.
+to mock your tRPC API and build product demos without changing your app/components.
 
 The interesting parts of the codebase are:
 

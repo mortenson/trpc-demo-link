@@ -23,7 +23,7 @@ const appRouter = router({
         slug: z
           .string()
           .regex(
-            /^[a-z0-9]+[a-z0-9-]+$/,
+            /^[a-z0-9]+[a-z0-9-]+[a-z0-9]+$/,
             "Slug can only contain lowercase letters, numbers, and hyphens, between 3-30 chars long",
           ),
         name: z.string().nonempty(),

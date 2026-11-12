@@ -88,8 +88,15 @@ const PostForm = (props: { slug: string; onSubmit: () => void }) => {
       onSubmit={onSubmit}
       style={{ display: "flex", flexDirection: "column", gap: "10px" }}
     >
-      <input type="text" name="text" value={text} onChange={(e) => setText(e.target.value)}></input>
-      <input type="submit" name="Submit" />
+      <input
+        id="text"
+        type="text"
+        name="text"
+        required
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      ></input>
+      <input type="submit" value="Submit" />
     </form>
   );
 };
@@ -135,6 +142,7 @@ const CreateOrganization = () => {
       >
         <label htmlFor="slug">Slug</label>
         <input
+          id="slug"
           type="text"
           name="slug"
           required
@@ -143,13 +151,14 @@ const CreateOrganization = () => {
         ></input>
         <label htmlFor="name">Name</label>
         <input
+          id="name"
           type="text"
           name="name"
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
         ></input>
-        <input type="submit" name="Submit" />
+        <input type="submit" value="Submit" />
       </form>
     </div>
   );

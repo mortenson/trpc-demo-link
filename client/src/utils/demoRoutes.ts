@@ -1,18 +1,21 @@
-import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { inferRouterInputs, inferRouterOutputs, TRPCError } from "@trpc/server";
 import { AppRouter } from "../../../server";
-import { TRPCClientError } from "@trpc/client";
 
 type RouterInput = inferRouterInputs<AppRouter>;
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
+// The shape of HTTP requests for an organization
 type OrganizationInputShape = {
   slug: string;
 };
 
+// Allows us to identify routes that return "{}"
 type EmptyShape = {
   [key: string]: never;
 };
 
+// A callback that consumes the route input and returns a mock
+// of the given route output.
 type DemoDataGenerator<T extends keyof RouterInput> =
   | ((input: RouterInput[T], signal?: AbortSignal) => RouterOutput[T])
   // Not used in this demo, but subscriptions also work
@@ -24,6 +27,7 @@ type DemoDataGenerator<T extends keyof RouterInput> =
       data: RouterOutput[T];
     }>);
 
+// A string union of route names that are organization-specific.
 type OrganizationRoute = {
   [T in keyof RouterInput]: RouterInput[T] extends OrganizationInputShape ? T : never;
 }[keyof RouterInput];
@@ -38,6 +42,8 @@ interface HasId {
   id: string;
 }
 
+// Totally optional but I found that having a utility to store
+// demo data in memory is pretty useful.
 class DataStore<T extends HasId> {
   private store = new Map<string, T>();
 
@@ -51,11 +57,11 @@ class DataStore<T extends HasId> {
   }
 
   get(id: string): T {
-    const report = this.store.get(id);
-    if (!report) {
-      throw TRPCClientError.from({ message: "Not Found", code: "NOT_FOUND" });
+    const item = this.store.get(id);
+    if (!item) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Not Found" });
     }
-    return report;
+    return item;
   }
 
   list(filterFn?: (item: T) => boolean): T[] {
@@ -76,6 +82,7 @@ class DataStore<T extends HasId> {
   }
 }
 
+// I usually type DataStore based on response/output types
 const postsStore = new DataStore<RouterOutput["listPosts"][number]>([
   {
     id: crypto.randomUUID(),
@@ -83,13 +90,18 @@ const postsStore = new DataStore<RouterOutput["listPosts"][number]>([
   },
   {
     id: crypto.randomUUID(),
-    text: "And here is another",
+    text: "You can submit new posts here, but they're just stored in memory",
   },
 ]);
 
 // "stable" UUIDs are often useful for full page refreshes of the in-memory demo
 const demoUuid = crypto.randomUUID();
 
+// Finally - the mocked routes. Due to the complex types above, you'll get type
+// errors if you don't mock a route that consumes a "slug" and produces a non-empty
+// response.
+//
+// Those optional routes can also be mocked if needed.
 export const demoRoutes: DemoRoutes = {
   getOrganization: () => ({
     id: demoUuid,
@@ -102,6 +114,5 @@ export const demoRoutes: DemoRoutes = {
     return { postId: id };
   },
   listPosts: () => postsStore.list(),
-  // ignorableRoute is not required here as it return an empty object ({})
-  // createOrganization and all other routes that do not consume a slug also are optional for mocking
+  // ignorableRoute and createOrganization are not required here as they return an empty object ({})
 };

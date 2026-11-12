@@ -1,0 +1,28 @@
+{
+  "name": "examples-minimal-react-server",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "npm run migrate && tsx watch index.ts",
+    "migrate": "drizzle-kit push",
+    "lint": "oxlint index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@trpc/server": "^11",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "drizzle-orm": "^0.45.4",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/cors": "^2.8.19",
+    "@types/node": "^24.19.2",
+    "drizzle-kit": "^0.31.11",
+    "oxlint": "^1.91.0",
+    "oxlint-tsgolint": "^7.0.2005",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.2"
+  }
+}
